@@ -3,10 +3,11 @@
   {{ currentWord.translation }} <b *ngIf="submitted"><span *ngIf="correct else elseBlock">Correct</span>
   <ng-template #elseBlock>Incorrect: {{ currentWord.word }}</ng-template></b>
 </p>
-<input #userword (keyup.enter)="submit(userword.value)">
-<button (click)="submit(userword.value)">
+<p>
+  <a href="" (click)="showHint()" *ngIf="!hintEnabled else elseBlock2">Hint</a>
+  <ng-template #elseBlock2>{{ hint }}</ng-template>
+</p><br>
+<input #userword (keyup.enter)="submit(userword.value, userword)">
+<button (click)="submit(userword.value, userword)">
   Done
-</button>
-<button (click)="updateWord()">
-  Next
 </button>

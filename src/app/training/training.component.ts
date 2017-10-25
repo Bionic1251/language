@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {WordService} from "../word.service";
 import {Word} from "../word.model";
 import {current} from "codelyzer/util/syntaxKind";
+import {log} from "util";
 
 @Component({
   selector: 'app-training',
@@ -16,6 +17,8 @@ export class TrainingComponent implements OnInit {
   correct: boolean;
   wordNumber: number;
   correctWordNumber: number;
+  hintEnabled = false;
+  hint: string;
 
   constructor(wordService: WordService) {
     this.words = [];
@@ -25,6 +28,7 @@ export class TrainingComponent implements OnInit {
     this.correct = false;
     this.wordNumber = 0;
     this.correctWordNumber = 0;
+    this.hintEnabled = false;
   }
 
   getWords(): void {
@@ -38,19 +42,44 @@ export class TrainingComponent implements OnInit {
     this.getWords();
   }
 
-  updateWord(): void {
+  updateWord(htmlInputElement?: HTMLInputElement): void {
     var randNumber: number = Math.floor(Math.random() * this.words.length);
     this.currentWord = this.words[randNumber];
     this.correct = false;
     this.submitted = false;
+    this.hintEnabled = false;
+    if (htmlInputElement != null) {
+      htmlInputElement.value = "";
+    }
   }
 
-  submit(word: string): void {
+  submit(word: string, htmlInputElement: HTMLInputElement): void {
+    if (this.submitted) {
+      this.updateWord(htmlInputElement);
+      return;
+    }
     this.correct = word == this.currentWord.word;
     this.submitted = true;
     this.wordNumber++;
     if (this.correct) {
       this.correctWordNumber++;
     }
+  }
+
+  showHint(): boolean {
+    this.hint = this.shuffleString(this.currentWord.word);
+    this.hintEnabled = true;
+    return false;
+  }
+
+  shuffleString(str: string): string {
+    for (let i = str.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * i);
+      if (i == j) {
+        continue;
+      }
+      str = str.substr(0, j) + str.substr(i, 1) + str.substr(j + 1, i - j - 1) + str.substr(j, 1) + str.substr(i + 1);
+    }
+    return str;
   }
 }
