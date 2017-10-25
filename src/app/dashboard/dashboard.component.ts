@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {WordService} from "../word.service";
 import {Word} from "../word.model";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-dashboard',
@@ -11,7 +12,7 @@ export class DashboardComponent implements OnInit {
   words: Word[];
   wordService: WordService;
 
-  constructor(wordService: WordService) {
+  constructor(wordService: WordService, private router: Router) {
     this.words = [];
     this.wordService = wordService;
   }
@@ -24,4 +25,7 @@ export class DashboardComponent implements OnInit {
     this.getWords();
   }
 
+  navigate(): void{
+    this.router.navigate(['/training']);
+  }
 }

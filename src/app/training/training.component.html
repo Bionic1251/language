@@ -1,7 +1,7 @@
 <p>{{ correctWordNumber }}/{{ wordNumber }}</p>
 <p>
-  {{ currentWord.translation }} <b *ngIf="submitted"><span *ngIf="correct else elseBlock">Correct</span>
-  <ng-template #elseBlock>Incorrect: {{ currentWord.word }}</ng-template></b>
+  {{ currentWord.translation }} <b *ngIf="submitted"><span *ngIf="correct" class="correct">Correct</span>
+  <span *ngIf="!correct" class="incorrect">Incorrect: {{ currentWord.word }}</span></b>
 </p>
 <p>
   <a href="" (click)="showHint()" *ngIf="!hintEnabled else elseBlock2">Hint</a>

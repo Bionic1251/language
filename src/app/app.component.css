@@ -1,0 +1,10 @@
+.main-container {
+  background-color: lightgoldenrodyellow;
+  width: 60%;
+  font-size: large;
+  margin-left: 15%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: solid grey;
+  text-align: center;
+}
