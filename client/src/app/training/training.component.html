@@ -1,0 +1,13 @@
+<p>{{ correctWordNumber }}/{{ wordNumber }}</p>
+<p>
+  {{ currentWord.translation }} <b *ngIf="submitted"><span *ngIf="correct" class="correct">Correct</span>
+  <span *ngIf="!correct" class="incorrect">Incorrect: {{ currentWord.text }}</span></b>
+</p>
+<p>
+  <a href="" (click)="showHint()" *ngIf="!hintEnabled else elseBlock2">Hint</a>
+  <ng-template #elseBlock2>{{ hint }}</ng-template>
+</p><br>
+<input #userword (keyup.enter)="submit(userword.value, userword)">
+<button (click)="submit(userword.value, userword)">
+  Done
+</button>
