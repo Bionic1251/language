@@ -17,7 +17,7 @@ export class DictionaryComponent implements OnInit {
 
   deleteWord(id: number): void {
     console.log("id " + id);
-    this.wordService.deleteWord(id);
+    this.wordService.deleteWord(id).then(() => this.getWords());
   }
 
   getWords(): void {
@@ -31,7 +31,8 @@ export class DictionaryComponent implements OnInit {
   }
 
   submitWord(textInput: HTMLInputElement, translationInput: HTMLInputElement): boolean {
-    this.wordService.addWord(textInput.value, translationInput.value);
+    this.wordService.addWord(textInput.value, translationInput.value)
+      .then(() => this.getWords());
     textInput.value = "";
     translationInput.value = "";
     return false;

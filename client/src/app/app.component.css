@@ -1,0 +1,13 @@
+.main-container{
+  border: solid;
+  border-width: 2px;
+  border-color: gray;
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+  background-color: bisque;
+  padding: 20px;
+  font-size: 20px;
+}
+
+

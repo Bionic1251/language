@@ -8,6 +8,7 @@ import {reject, resolve} from "q";
 
 @Injectable()
 export class WordService {
+  private readonly USER_ID:number = 1;
   private url = 'http://localhost:8080/';
   words: Word[];
 
@@ -15,24 +16,23 @@ export class WordService {
     this.words = [];
   }
 
-  addWord(text: string, translation: string): void {
-    var newUrl = this.url.concat('add_word/', text, '/', translation);
-    this.http.get(newUrl)
+  addWord(text: string, translation: string): Promise<any> {
+    var newUrl = this.url.concat('add_word');
+    var data = {text: text, translation: translation, user_id: this.USER_ID};
+    return this.http.post(newUrl, data)
       .toPromise()
-      .then(response => console.log(response))
       .catch(this.handleError);
   }
 
-  deleteWord(id: number): void {
-    var newUrl = this.url.concat('delete_word/', id + "");
-    this.http.get(newUrl)
+  deleteWord(id: number): Promise<any> {
+    var newUrl = this.url.concat('delete_word/', this.USER_ID + "", "/", id + "");
+    return this.http.get(newUrl)
       .toPromise()
-      .then(response => console.log(response))
       .catch(this.handleError);
   }
 
   getWords(): Promise<Word[]> {
-    var newUrl = this.url.concat("get_words");
+    var newUrl = this.url.concat("get_words/" + this.USER_ID);
     return this.http.get(newUrl)
       .toPromise()
       .then(response => {
