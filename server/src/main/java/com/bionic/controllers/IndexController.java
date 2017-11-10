@@ -9,11 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -24,10 +31,13 @@ import java.util.stream.Stream;
 @Controller
 public class IndexController {
     private static final String OK_MESSAGE = "{\"msg\":\"OK\"}";
+    private SimpleDateFormat dateFormat;
     private SessionFactory factory;
 
     public IndexController() {
         factory = new Configuration().configure().buildSessionFactory();
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        //createFakeUser();
     }
 
     private User getUser(int id) {
@@ -47,22 +57,27 @@ public class IndexController {
         String text = jsonObject.getString("text");
         String translation = jsonObject.getString("translation");
         Integer userId = jsonObject.getInt("user_id");
+        Word word = new Word(new Date(), text, translation);
+        addWord(userId, word);
+        return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
+    }
+
+    private void addWord(Integer userId, Word word) {
+        Set<Word> wordSet = new HashSet<Word>();
+        wordSet.add(word);
+        addWords(userId, wordSet);
+    }
+
+    private void addWords(Integer userId, Set<Word> newWords) {
+        User user = getUser(userId);
         Session session = factory.openSession();
         session.beginTransaction();
-        User user = getUser(userId);
-        Word word = new Word(new Date(), text, translation);
         Set<Word> wordSet = new HashSet<Word>(user.getWords());
-        wordSet.add(word);
+        wordSet.addAll(newWords);
         user.setWords(wordSet);
-        //user.getWords().add(word);
-        //Set<User> users = new HashSet<User>(word.getUsers());
-        //users.add(user);
-        //word.setUsers(users);
-        //session.saveOrUpdate(word);
         session.saveOrUpdate(user);
         session.getTransaction().commit();
         session.close();
-        return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
     }
 
     private JsonObject parseRequestParameters(String requestParams) {
@@ -115,6 +130,39 @@ public class IndexController {
         session.getTransaction().commit();
         session.close();
         return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/upload_file", method = RequestMethod.POST)
+    public ResponseEntity<String> submit(@RequestParam("file") MultipartFile file, @RequestParam("user_id") Integer userId) {
+        try {
+            String content = new String(file.getBytes());
+            String[] lines = content.split("\r\n");
+            Set<Word> wordSet = new HashSet<Word>();
+            for (String line : lines) {
+                String[] strWord = line.split(",");
+                Date date = dateFormat.parse(strWord[2]);
+                wordSet.add(new Word(date, strWord[0], strWord[1]));
+            }
+            addWords(userId, wordSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/download_csv/{userId}", method = RequestMethod.GET)
+    public void download(HttpServletResponse response, @PathVariable Integer userId) {
+        response.setContentType("text/csv");
+        try {
+            PrintWriter writer = response.getWriter();
+            User user = getUser(userId);
+            for (Word word : user.getWords()) {
+                writer.println(word.getText() + "," + word.getTranslation() + "," + dateFormat.format(word.getCreationTimestamp()));
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void createFakeUser() {

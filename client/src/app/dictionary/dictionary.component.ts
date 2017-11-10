@@ -11,7 +11,7 @@ import {Word} from "../word.model";
 export class DictionaryComponent implements OnInit {
   words: Word[];
 
-  constructor(private wordService: WordService) {
+  constructor(public wordService: WordService) {
     this.words = [];
   }
 

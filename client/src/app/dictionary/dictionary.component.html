@@ -1,5 +1,14 @@
 <h1>Dictionary</h1>
-<a href="/dashboard">Dashboard</a>/<a href="/text-selection">Training</a>
+
+<form method="POST" action="http://localhost:8080/upload_file" enctype="multipart/form-data">
+  <input type="hidden" value="{{ wordService.USER_ID }}" name="user_id">
+  File to upload: <input type="file" name="file">
+
+
+  <input type="submit" value="Upload">
+</form>
+
+<a href="/dashboard">Dashboard</a>/<a href="/text-selection">Training</a> / <a href="http://localhost:8080/download_csv/{{ wordService.USER_ID }}">Export your data</a>
 <p>Word <input #text_input>
   Translation <input #translation_input>
   <button (click)="submitWord(text_input, translation_input)">Add</button>

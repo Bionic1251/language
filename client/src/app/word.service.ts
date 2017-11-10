@@ -1,14 +1,14 @@
 import {Word} from "./word.model";
 import {WORDS} from "./mock-words";
 import {Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 import 'rxjs/add/operator/toPromise';
 import {reject, resolve} from "q";
 
 @Injectable()
 export class WordService {
-  private readonly USER_ID:number = 1;
+  public readonly USER_ID: number = 1;
   private url = 'http://localhost:8080/';
   words: Word[];
 
@@ -19,7 +19,9 @@ export class WordService {
   addWord(text: string, translation: string): Promise<any> {
     var newUrl = this.url.concat('add_word');
     var data = {text: text, translation: translation, user_id: this.USER_ID};
-    return this.http.post(newUrl, data)
+    return this.http.post(newUrl, data, {
+      headers: new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8')
+    })
       .toPromise()
       .catch(this.handleError);
   }
