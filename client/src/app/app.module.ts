@@ -9,6 +9,7 @@ import {RouterModule} from "@angular/router";
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {WordSelectionComponent} from './word-selection/word-selection.component';
 import {DictionaryComponent} from './dictionary/dictionary.component';
+import { ImportExportComponent } from './import-export/import-export.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import {DictionaryComponent} from './dictionary/dictionary.component';
     TrainingComponent,
     DashboardComponent,
     WordSelectionComponent,
-    DictionaryComponent
+    DictionaryComponent,
+    ImportExportComponent
   ],
   imports: [
     BrowserModule,
@@ -25,6 +27,7 @@ import {DictionaryComponent} from './dictionary/dictionary.component';
       {path: 'training', component: TrainingComponent},
       {path: 'dashboard', component: DashboardComponent},
       {path: 'text-selection', component: WordSelectionComponent},
+      {path: 'import-export', component: ImportExportComponent},
       {path: 'dictionary', component: DictionaryComponent},
       {path: '', redirectTo: '/dashboard', pathMatch: 'full'}
     ]),

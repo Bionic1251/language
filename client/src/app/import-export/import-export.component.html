@@ -1,0 +1,8 @@
+<a href="http://localhost:8080/download_csv/{{ wordService.USER_ID }}">Export your data</a>
+<form method="POST" action="http://localhost:8080/upload_file" enctype="multipart/form-data">
+  <input type="hidden" value="{{ wordService.USER_ID }}" name="user_id">
+  File to upload: <input type="file" name="file">
+
+
+  <input type="submit" value="Upload">
+</form>
