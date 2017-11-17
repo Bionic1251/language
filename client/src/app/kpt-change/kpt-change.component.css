@@ -1,0 +1,27 @@
+.hint {
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+.hint tr td:nth-child(1), .hint tr td:nth-child(2) {
+  font-weight: bold;
+}
+
+.blank_row {
+  height: 25px !important;
+}
+
+.blank_row_incorrect {
+  height: 10px !important;
+  color: red;
+}
+
+.blank_row_correct {
+  height: 10px !important;
+  color: green;
+}
+
+.question {
+  font-weight: bold;
+}

@@ -19,6 +19,7 @@ export class TrainingComponent implements OnInit {
   correctWordNumber: number;
   hintEnabled = false;
   hint: string;
+  public userWord: string;
 
   constructor(wordService: WordService) {
     this.words = [];
@@ -29,6 +30,7 @@ export class TrainingComponent implements OnInit {
     this.wordNumber = 0;
     this.correctWordNumber = 0;
     this.hintEnabled = false;
+    this.userWord = "";
   }
 
   getWords(): void {
@@ -42,23 +44,21 @@ export class TrainingComponent implements OnInit {
     this.getWords();
   }
 
-  updateWord(htmlInputElement?: HTMLInputElement): void {
+  updateWord(): void {
     var randNumber: number = Math.floor(Math.random() * this.words.length);
     this.currentWord = this.words[randNumber];
     this.correct = false;
     this.submitted = false;
     this.hintEnabled = false;
-    if (htmlInputElement != null) {
-      htmlInputElement.value = "";
-    }
+    this.userWord = "";
   }
 
-  submit(word: string, htmlInputElement: HTMLInputElement): void {
+  submit(): void {
     if (this.submitted) {
-      this.updateWord(htmlInputElement);
+      this.updateWord();
       return;
     }
-    this.correct = word == this.currentWord.text;
+    this.correct = this.userWord == this.currentWord.text;
     this.submitted = true;
     this.wordNumber++;
     if (this.correct) {

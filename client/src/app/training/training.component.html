@@ -7,7 +7,7 @@
   <a href="" (click)="showHint()" *ngIf="!hintEnabled else elseBlock2">Hint</a>
   <ng-template #elseBlock2>{{ hint }}</ng-template>
 </p><br>
-<input #userword (keyup.enter)="submit(userword.value, userword)">
-<button (click)="submit(userword.value, userword)">
+<input (keyup.enter)="submit()" [(ngModel)]="userWord">
+<button (click)="submit()">
   Done
 </button>

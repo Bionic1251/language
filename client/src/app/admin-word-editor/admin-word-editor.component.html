@@ -1,0 +1,19 @@
+<p>Word <input #text_input>
+  Translation <input #translation_input>
+  <select #pos>
+    <option *ngFor="let pos of POSs" [value]="pos.id">{{ pos.name }}</option>
+  </select>
+  <button (click)="submitWord(text_input, translation_input, pos.value)">Add</button>
+</p>
+
+<table>
+  <tr *ngFor="let word of words">
+    <td>{{ word.text }}</td>
+    <td>{{ word.translation }}</td>
+    <td>
+      <select (change)="select(word.id, word.posId)" [(ngModel)]="word.posId">
+        <option *ngFor="let pos of POSs" [value]="pos.id">{{ pos.name }}</option>
+      </select>
+    </td>
+  </tr>
+</table>
