@@ -37,7 +37,8 @@ public class IndexController {
     public IndexController() {
         factory = new Configuration().configure().buildSessionFactory();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        //createFakeUser();
+        /*createFakeUser();
+        fillPos();*/
     }
 
     private User getUser(int id) {
@@ -47,6 +48,24 @@ public class IndexController {
         User user = query.getSingleResult();
         session.close();
         return user;
+    }
+
+    private POS getPOS(int id) {
+        Session session = factory.openSession();
+        Query<POS> query = session.createQuery("select p from POS p left outer join fetch p.words where p.id=:id");
+        query.setParameter("id", id);
+        POS pos = query.getSingleResult();
+        session.close();
+        return pos;
+    }
+
+    private Word getWord(int id) {
+        Session session = factory.openSession();
+        Query<Word> query = session.createQuery("select w from Word w where w.id=:id");
+        query.setParameter("id", id);
+        Word word = query.getSingleResult();
+        session.close();
+        return word;
     }
 
 
@@ -59,6 +78,20 @@ public class IndexController {
         Integer userId = jsonObject.getInt("user_id");
         Word word = new Word(new Date(), text, translation);
         addWord(userId, word);
+        return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/add_admin_word",
+            method = RequestMethod.POST)
+    public ResponseEntity<String> addAdminWord(@RequestBody String jsonRequest) {
+        JsonObject jsonObject = parseRequestParameters(jsonRequest);
+        String text = jsonObject.getString("text");
+        String translation = jsonObject.getString("translation");
+        Integer posId = jsonObject.getInt("pos_id");
+        POS pos = getPOS(posId);
+        Word word = new Word(new Date(), text, translation);
+        word.setPos(pos);
+        addAdminWords(word);
         return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
     }
 
@@ -80,6 +113,14 @@ public class IndexController {
         session.close();
     }
 
+    private void addAdminWords(Word word) {
+        Session session = factory.openSession();
+        session.beginTransaction();
+        session.saveOrUpdate(word);
+        session.getTransaction().commit();
+        session.close();
+    }
+
     private JsonObject parseRequestParameters(String requestParams) {
         JsonReader reader = Json.createReader(new StringReader(requestParams));
         JsonObject jsonObject = reader.readObject();
@@ -88,13 +129,18 @@ public class IndexController {
     }
 
 
-    @RequestMapping(value = "/get_words/{user_id}",
+    @RequestMapping(value = "/get_words/{userId}",
             method = RequestMethod.GET,
             produces = "application/json")
-    public ResponseEntity<String> getWords(@PathVariable Integer user_id) {
+    public ResponseEntity<String> getWords(@PathVariable Integer userId) {
         Session session = factory.openSession();
-        Query<Word> query = session.createQuery("select w from Word w join w.users u where u.id=:user_id order by w.creationTimestamp desc");
-        query.setParameter("user_id", user_id);
+        Query<Word> query;
+        if (userId < 0) {
+            query = session.createQuery("select w from Word w left join fetch w.pos order by w.creationTimestamp desc");
+        } else {
+            query = session.createQuery("select w from Word w left join fetch w.pos join w.users u where u.id=:user_id order by w.creationTimestamp desc");
+            query.setParameter("user_id", userId);
+        }
         List<Word> wordList = query.list();
         session.close();
 
@@ -104,6 +150,28 @@ public class IndexController {
                     .add("id", word.getId())
                     .add("text", word.getText())
                     .add("translation", word.getTranslation())
+                    .add("posId", word.getPos() == null ? "" : word.getPos().getId() + "")
+                    .build();
+            jsonArrayBuilder.add(obj);
+        }
+        JsonArray jsonArray = jsonArrayBuilder.build();
+        return new ResponseEntity<String>(jsonArray.toString(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/get_poss",
+            method = RequestMethod.GET,
+            produces = "application/json")
+    public ResponseEntity<String> getWords() {
+        Session session = factory.openSession();
+        Query<POS> query = session.createQuery("select p from POS p");
+        List<POS> posList = query.list();
+        session.close();
+
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+        for (POS pos : posList) {
+            JsonObject obj = Json.createObjectBuilder()
+                    .add("id", pos.getId())
+                    .add("name", pos.getName())
                     .build();
             jsonArrayBuilder.add(obj);
         }
@@ -127,6 +195,22 @@ public class IndexController {
         user.setWords(newWords);
         session.beginTransaction();
         session.saveOrUpdate(user);
+        session.getTransaction().commit();
+        session.close();
+        return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/update_word_pos/{wordId}/{posId}",
+            method = RequestMethod.GET,
+            produces = "application/json")
+    public ResponseEntity<String> updateWordPOS(@PathVariable Integer wordId, @PathVariable Integer posId) {
+        Session session = factory.openSession();
+        POS pos = getPOS(posId);
+        Word word = getWord(wordId);
+        word.setPos(pos);
+        session.beginTransaction();
+        session.saveOrUpdate(word);
+        session.saveOrUpdate(word);
         session.getTransaction().commit();
         session.close();
         return new ResponseEntity<String>(OK_MESSAGE, HttpStatus.OK);
@@ -174,6 +258,27 @@ public class IndexController {
         wordSet.add(word1);
         user.setWords(wordSet);
         session.save(user);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    private void fillPos() {
+        Session session = factory.openSession();
+        session.beginTransaction();
+        POS pos = new POS("noun");
+        session.save(pos);
+        pos = new POS("verb");
+        session.save(pos);
+        pos = new POS("adverb");
+        session.save(pos);
+        pos = new POS("adjective");
+        session.save(pos);
+        pos = new POS("interjection");
+        session.save(pos);
+        pos = new POS("pronoun");
+        session.save(pos);
+        pos = new POS("other");
+        session.save(pos);
         session.getTransaction().commit();
         session.close();
     }

@@ -32,6 +32,10 @@ public class Word implements Serializable {
     @ManyToMany(mappedBy = "words")
     private Set<User> users = new HashSet<User>();
 
+    @ManyToOne
+    @JoinColumn(name="pos_id")
+    private POS pos;
+
     public Word(Date creationTimestamp, String text, String translation) {
         this.creationTimestamp = creationTimestamp;
         this.text = text;
@@ -79,5 +83,13 @@ public class Word implements Serializable {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public POS getPos() {
+        return pos;
+    }
+
+    public void setPos(POS pos) {
+        this.pos = pos;
     }
 }

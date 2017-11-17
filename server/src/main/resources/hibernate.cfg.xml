@@ -24,6 +24,7 @@
         <!-- Annotated entity classes -->
         <mapping class="com.bionic.controllers.User"/>
         <mapping class="com.bionic.controllers.Word"/>
+        <mapping class="com.bionic.controllers.POS"/>
 
     </session-factory>
 </hibernate-configuration>
